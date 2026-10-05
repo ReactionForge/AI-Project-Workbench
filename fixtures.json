@@ -1,0 +1,88 @@
+[
+  {
+    "Id": "demo-atlas",
+    "Name": "星图笔记",
+    "Description": "虚构应用项目 · 知识差异示例",
+    "Goal": "按批准 R2 增加 JSON 导出并补充验证",
+    "Knowledge": [
+      {
+        "Id": "K-001",
+        "Role": "已批准意图",
+        "Text": "导出应支持 CSV 和 JSON；JSON 要求尚未实现也保持有效。",
+        "Lifecycle": "active",
+        "Verification": "unknown",
+        "Revision": "R2",
+        "Supersedes": "K-003",
+        "VerifiedAt": "未核实（演示）"
+      },
+      {
+        "Id": "K-002",
+        "Role": "观察实现",
+        "Text": "当前虚构实现仅支持 CSV，JSON 缺少实现与测试证据。",
+        "Lifecycle": "active",
+        "Verification": "needs_verification",
+        "Revision": "demo-code-r1",
+        "Supersedes": "",
+        "VerifiedAt": "2026-10-01（虚构）"
+      },
+      {
+        "Id": "K-003",
+        "Role": "已批准意图",
+        "Text": "旧版仅 CSV，不支持 JSON。",
+        "Lifecycle": "superseded",
+        "Verification": "verified",
+        "Revision": "R1",
+        "Supersedes": "",
+        "VerifiedAt": "2026-09-20（虚构）"
+      },
+      {
+        "Id": "K-004",
+        "Role": "待批准方案",
+        "Text": "以后考虑自动并行调度；未批准，不能作为任务要求。",
+        "Lifecycle": "active",
+        "Verification": "unknown",
+        "Revision": "P1",
+        "Supersedes": "",
+        "VerifiedAt": "未核实"
+      }
+    ]
+  },
+  {
+    "Id": "demo-orbit",
+    "Name": "轨道清单",
+    "Description": "虚构数据项目 · 独立作用域示例",
+    "Goal": "核对虚构采集清单与 JSON 输出规格",
+    "Knowledge": [
+      {
+        "Id": "O-001",
+        "Role": "已批准意图",
+        "Text": "独立导出规格支持 CSV 和 JSON；不得读取星图笔记项目。",
+        "Lifecycle": "active",
+        "Verification": "unknown",
+        "Revision": "R2",
+        "Supersedes": "O-003",
+        "VerifiedAt": "未核实（演示）"
+      },
+      {
+        "Id": "O-002",
+        "Role": "观察实现",
+        "Text": "当前虚构清单仅生成 CSV，尚无 JSON 验证证据。",
+        "Lifecycle": "active",
+        "Verification": "needs_verification",
+        "Revision": "demo-code-r1",
+        "Supersedes": "",
+        "VerifiedAt": "2026-10-02（虚构）"
+      },
+      {
+        "Id": "O-003",
+        "Role": "已批准意图",
+        "Text": "旧版仅 CSV。",
+        "Lifecycle": "superseded",
+        "Verification": "verified",
+        "Revision": "R1",
+        "Supersedes": "",
+        "VerifiedAt": "2026-09-22（虚构）"
+      }
+    ]
+  }
+]

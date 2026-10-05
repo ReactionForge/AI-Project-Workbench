@@ -1,0 +1,29 @@
+# Inert design example: NOT installed under .github/workflows.
+# Before any activation: user approves triggers/costs/permissions, review actions,
+# replace every REPLACE_WITH_FULL_COMMIT_SHA with the reviewed immutable SHA.
+name: Example manual source validation
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: false # deliberately disabled, even if copied without review
+    runs-on: windows-latest # hosted only; never the user's PC
+    steps:
+      - uses: actions/checkout@REPLACE_WITH_FULL_COMMIT_SHA
+        with:
+          path: workspace/repo
+          persist-credentials: false
+      - uses: actions/setup-dotnet@REPLACE_WITH_FULL_COMMIT_SHA
+        with:
+          dotnet-version: 8.0.424
+      - shell: pwsh
+        run: |
+          $root = Join-Path $env:GITHUB_WORKSPACE 'workspace'
+          Copy-Item -LiteralPath (Join-Path $root 'repo/workspace-marker.json') -Destination (Join-Path $root 'project.json')
+          New-Item -ItemType Directory -Path (Join-Path $root 'runs/temp') -Force | Out-Null
+          & (Join-Path $root 'repo/build.ps1')
+          & (Join-Path $root 'releases/v0.4.0/AIProjectWorkbench.exe') --self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Domain checks failed' }
+# No push, release, PR secrets, signing, artifact publishing or attestations.
+# UI-smoke/external desktop input need separately specified validation.
