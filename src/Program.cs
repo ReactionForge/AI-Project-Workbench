@@ -246,11 +246,11 @@ public partial class MainWindow:Window {
  Entry[] entries=Array.Empty<Entry>();ProjectRecord? project;string selected="";string page="项目总览";string taskId="";string filter="";bool history;
  string preview="",previewAnchor="";
  public MainWindow(Workspace w) {
-  workspace=w;Title="AI 项目工作台 · 0.3 单机 MVP"+(w.Demo?" · 演示":"");Width=Math.Min(1240,SystemParameters.WorkArea.Width-30);Height=Math.Min(840,SystemParameters.WorkArea.Height-30);MinWidth=850;MinHeight=480;WindowStartupLocation=WindowStartupLocation.CenterScreen;FontFamily=new FontFamily("Microsoft YaHei UI");FontSize=14;Background=Color("#F5F7FB");
+  workspace=w;Title="AI 项目工作台 · 0.5 发布计划预览"+(w.Demo?" · 演示":"");Width=Math.Min(1240,SystemParameters.WorkArea.Width-30);Height=Math.Min(840,SystemParameters.WorkArea.Height-30);MinWidth=850;MinHeight=480;WindowStartupLocation=WindowStartupLocation.CenterScreen;FontFamily=new FontFamily("Microsoft YaHei UI");FontSize=14;Background=Color("#F5F7FB");
   var root=new Grid{Background=Color("#F5F7FB")};root.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(200)});root.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});Content=root;
   var nav=new StackPanel{Margin=new Thickness(18,28,18,18)};root.Children.Add(new Border{Background=Color("#14233B"),Child=new ScrollViewer{Content=nav,VerticalScrollBarVisibility=ScrollBarVisibility.Auto}});
   nav.Children.Add(Text("AI 项目工作台",21,"#FFFFFF",true));nav.Children.Add(Text("目标 · 下一步 · 风险",12,"#AAB8D1"));nav.Children.Add(new Border{Height=25});
-  foreach(var label in new[]{"项目总览","任务与接手","知识与冲突","交接与备份","环境与边界"}) {
+  foreach(var label in new[]{"项目总览","任务与接手","知识与冲突","交接与备份","发布计划","环境与边界"}) {
    var b=Button(label,()=>Show(label));b.Background=Color("#20344F");b.Foreground=Brushes.White;b.HorizontalContentAlignment=HorizontalAlignment.Left;nav.Children.Add(b);
   }
   nav.Children.Add(new Border{Height=35});nav.Children.Add(Text(w.Demo?"演示数据独立存储":"本地空白模式\n仅管理本项目沙盒",12,"#AAB8D1"));
@@ -262,10 +262,11 @@ public partial class MainWindow:Window {
   header.Children.Add(Button("刷新项目文档",()=>{Refresh();preview="";Show(page);}));
   header.Children.Add(Button("恢复与副本",()=>{ContentPage("恢复与副本");Row(Button("预览ZIP恢复",ChooseRecovery,true),Button("打开恢复副本",ChooseExistingRecovery));Card("范围","仅本工作区runs内的备份与恢复副本，当前没有项目也可访问。");}));
   main.Children.Add(header);
-  picker.SelectionChanged+=(_,__)=>{if(picker.SelectedIndex<0||picker.SelectedIndex>=entries.Length)return;selected=entries[picker.SelectedIndex].Id;taskId="";filter="";history=false;preview="";LoadCurrent();Show(page);};
+  picker.SelectionChanged+=(_,__)=>{if(picker.SelectedIndex<0||picker.SelectedIndex>=entries.Length)return;InvalidatePublication();selected=entries[picker.SelectedIndex].Id;taskId="";filter="";history=false;preview="";LoadCurrent();Show(page);};
   var scroll=new ScrollViewer{Content=body,VerticalScrollBarVisibility=ScrollBarVisibility.Auto};Grid.SetRow(scroll,1);main.Children.Add(scroll);
   notice.FontSize=12;notice.Foreground=Color("#556B87");notice.Margin=new Thickness(0,15,0,0);Grid.SetRow(notice,2);main.Children.Add(notice);
   PreviewKeyDown+=(_,e)=>{if(e.Key==System.Windows.Input.Key.Escape){Show("项目总览");e.Handled=true;}};
+  Closed+=(_,__)=>InvalidatePublication();
   Refresh();Show(page);
  }
  static SolidColorBrush Color(string hex)=>new((System.Windows.Media.Color)ColorConverter.ConvertFromString(hex));
@@ -287,9 +288,11 @@ public partial class MainWindow:Window {
  void LoadCurrent(){try{project=workspace.Load(selected);}catch(Exception ex){project=null;notice.Text="记录读取失败："+ex.Message;}}
  WorkTask? Current=>project?.Tasks.FirstOrDefault(t=>t.Id==taskId)??project?.Tasks.FirstOrDefault();
  void Show(string name) {
+  if(page=="发布计划"&&name!="发布计划")InvalidatePublication();
   page=name;body.Children.Clear();body.Children.Add(Text(name,28,"#142B4B",true));
   body.Children.Add(Text(workspace.Demo?"独立演示模式 · 虚构内容，仅用于体验":"本地模式 · 数据仅保存于 AI-Project-Workbench 内",12,"#627896"));
-  foreach(var label in new[]{"项目总览","任务与接手","知识与冲突","交接与备份","环境与边界"})if(actions.TryGetValue(label,out var b)){b.Background=Color(label==page?"#3568D4":"#20344F");b.Foreground=Brushes.White;}
+  foreach(var label in new[]{"项目总览","任务与接手","知识与冲突","交接与备份","发布计划","环境与边界"})if(actions.TryGetValue(label,out var b)){b.Background=Color(label==page?"#3568D4":"#20344F");b.Foreground=Brushes.White;}
+  if(page=="发布计划"){PublicationPage();return;}
   if(project==null) {
    Card(selected==""?"创建你的第一个沙盒项目":"记录读取失败",selected==""?"只需要名称与目标。项目拥有独立任务、知识和交接；App 不会读取其他工作区。":"损坏记录不会被示例或空记录覆盖。可先保留当前文件，再从上一版本恢复。",selected!="");
    Row(Button("创建第一个项目",()=>EditProject(true),true));
@@ -439,8 +442,9 @@ public static class Program {
   int workspaceArgument=Array.IndexOf(args,"--workspace");
   if(workspaceArgument>=0){if(workspaceArgument+1>=args.Length)throw new InvalidOperationException("--workspace缺少恢复副本路径");var restored=RecoveryStartup.Resolve(root,args[workspaceArgument+1]);root=restored.Root;recoveryDemo=restored.Demo;}
   if(args.Contains("--self-test"))return Tests.Run(root);
+  if(args.Contains("--publication-check")){try{var service=new PublicationService(new Workspace(root));var report=service.Inspect("self",System.Threading.CancellationToken.None).GetAwaiter().GetResult();if(args.Contains("--online"))report=service.ObserveGithub(report,System.Threading.CancellationToken.None).GetAwaiter().GetResult();service.SaveReport(report);File.WriteAllText(Path.Combine(root,"runs","publication-native.json"),JsonSerializer.Serialize(report,Workspace.Json));return 0;}catch{File.WriteAllText(Path.Combine(root,"runs","publication-native-error.log"),"readonly check failed; no sync claimed");return 1;}}
   var runtimeRoot=root;
-  if(args.Contains("--ui-smoke")){runtimeRoot=Path.Combine(root,"runs","v4-ui-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(runtimeRoot);File.Copy(Path.Combine(root,"project.json"),Path.Combine(runtimeRoot,"project.json"));Directory.CreateDirectory(Path.Combine(runtimeRoot,"runs"));}
+  if(args.Contains("--ui-smoke")){runtimeRoot=Path.Combine(root,"runs","v5-ui-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(runtimeRoot);File.Copy(Path.Combine(root,"project.json"),Path.Combine(runtimeRoot,"project.json"));Directory.CreateDirectory(Path.Combine(runtimeRoot,"runs"));}
   var w=new Workspace(runtimeRoot,recoveryDemo||args.Contains("--demo")||args.Contains("--ui-smoke"));w.SeedExamples();
   var app=new Application();var win=new MainWindow(w);
   if(args.Contains("--ui-smoke"))win.Loaded+=async(_,__)=>{
@@ -481,7 +485,19 @@ public static class Program {
     gitWindow.Invoke("预览ZIP恢复");gitWindow.Invoke("预览选中ZIP");
     Tests.Check(gitWindow.Visible().Contains("新目标：")&&gitWindow.Visible().Contains("不覆盖原项目"),"WPF independent restore confirmation preview",lines);
     gitWindow.Render(Path.Combine(root,"runs","mvp-restore-preview.png"));
-    gitWindow.Invoke("返回交接与备份");Tests.Check(gitWindow.Visible().Contains("备份与恢复"),"WPF content preview return",lines);gitWindow.Close();
+    gitWindow.Invoke("返回交接与备份");Tests.Check(gitWindow.Visible().Contains("备份与恢复"),"WPF content preview return",lines);
+    gitWindow.Invoke("发布计划");await gitWindow.CheckPublicationForTest();
+    Tests.Check(gitWindow.Visible().Contains("uncommitted")&&gitWindow.Visible().Contains("远端：unknown")&&gitWindow.Visible().Contains("not_registered"),"WPF publication real local preflight and honest evidence",lines);
+    gitWindow.Render(Path.Combine(root,"runs","v5-publication-preview.png"));
+    gitWindow.Invoke("选择全部受检文件");await gitWindow.ExportPublicationForTest();
+    Tests.Check(gitWindow.Visible().Contains("审查计划已写入")&&Directory.GetFiles(w.Safe("runs/publication/"+w.Mode+"-"+gitFixture.Id),"plan-*.json").Length==1,"WPF publication actual plan export file IO",lines);
+    gitWindow.Render(Path.Combine(root,"runs","v5-publication-export.png"));
+    gitWindow.ScrollPublicationForTest(1050);gitWindow.Render(Path.Combine(root,"runs","v5-publication-files.png"));
+    var activeCheck=gitWindow.CheckPublicationForTest();gitWindow.Invoke("取消检查");await activeCheck;
+    Tests.Check(gitWindow.PublicationStaleForTest&&gitWindow.Visible().Contains("检查已取消"),"WPF publication cancellation does not accept partial result",lines);
+    gitWindow.Invoke("返回项目总览");gitWindow.Invoke("发布计划");Tests.Check(gitWindow.PublicationStaleForTest,"WPF publication return invalidates current preview",lines);
+    gitWindow.Select(Array.FindIndex(w.List(),x=>x.Id!=gitFixture.Id));Tests.Check(!gitWindow.Visible().Contains("HEAD："),"WPF publication switching project isolates prior report",lines);
+    var reloaded=new MainWindow(w);reloaded.Show();reloaded.Select(Array.FindIndex(w.List(),x=>x.Id==gitFixture.Id));reloaded.Invoke("发布计划");Tests.Check(reloaded.PublicationStaleForTest&&reloaded.Visible().Contains("历史检查"),"WPF publication reload historical state requires recheck",lines);reloaded.Close();gitWindow.Close();
     lines.Add("NOT RUN: external keyboard/mouse and physical DPI switching; supported native CU tool absent; current desktop unlock not verified (previously locked)");
     lines.Add("RENDER ONLY: 125/150/200% render resolution; not actual OS scaling");
     File.WriteAllLines(Path.Combine(root,"runs","mvp-ui.log"),lines);
@@ -548,6 +564,7 @@ public static class Tests {
    }
    MarkdownTests.Run(w,logs);
    GitAssetTests.Run(w,logs);
+   PublicationTests.Run(w,logs).GetAwaiter().GetResult();
    File.WriteAllLines(Path.Combine(root,"runs","mvp-tests.log"),logs);return 0;
   }catch(Exception ex){File.WriteAllLines(Path.Combine(root,"runs","mvp-tests.log"),logs.Concat(new[]{"FAIL: "+ex}));return 1;}
  }

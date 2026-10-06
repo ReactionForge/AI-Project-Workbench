@@ -1,6 +1,6 @@
 # AI 项目工作台接手入口
 project_id: ai-project-workbench
-1. 先读 docs/PROJECT.md、docs/STATE.md 与 docs/tasks/T-002.md；按需补充相关规范，不通读私人历史。
+1. 先读 docs/PROJECT.md、docs/STATE.md 与 docs/tasks/T-003.md；按需补充相关规范，不通读私人历史。
 2. 日常开发留在大写 DEV。main 重大合并由项目用户决定；普通 push 授权不能代替合并授权。
 3. 所有源码与现行产品规范在本 repo；外层输入、数据、运行证据与历史不公开、不迁移。
 4. 批准意图、观察实现、待批准方案分开；生命周期、最后验证与过期分别记录。代码变化只触发重核，AI 不能改需求掩盖实现差距。
@@ -8,5 +8,5 @@ project_id: ai-project-workbench
 6. 使用 build.ps1，缓存/临时/输出限定所属工作区；不改系统或全局配置。
 7. 检查入口见 docs/TESTING.md。内部 WPF 渲染不等于外部键鼠/物理 DPI 验证，未运行不写通过。
 8. GitHub 按 docs/GITHUB-WORKFLOW.md：精确清单和 diff 审核、现有历史检查、身份/目标/分支核实、远端 SHA 验证；未知结果先查询。不要 force push、清理/重置远端、自动合并或后台发布。
-9. 当前公开发布仅本项目安全源码和开发文档；App 远端发布 UX 仍是设计，不自动启用 CI/权限/签名/凭据。
+9. 当前公开发布仅本项目安全源码和开发文档；App 仅有只读检查/预览/导出计划（PUBLICATION-PLAN.md），无远端写入口；不自动启用 CI/权限/签名/凭据。
 10. 受管理项目的恢复仅按明确预览与确认生成新副本，不覆盖原项目。交接增量更新同一任务卡。

@@ -1,6 +1,6 @@
 {
   "project_id": "ai-project-workbench",
-  "version": "0.4.0",
+  "version": "0.5.0-rc.1",
   "mode": "local-mvp",
   "canonical_knowledge": "repo/docs"
 }

@@ -1,5 +1,5 @@
 # 启动与使用
-直接运行 <本项目工作区>/releases/v0.4.0/AIProjectWorkbench.exe。
+直接运行 <本项目工作区>/runs/v5-build/AIProjectWorkbench.exe。
 它是原生桌面App，没有浏览器或Web服务。依赖现有.NET8 WindowsDesktop；本机已确认8.0.30。无需管理员、安装器或新增SDK。便携包需整体解压，保留project.json及相对目录；仅拷exe会因缺少项目标记而拒绝启动。
 
 正常启动为空白本地模式：
@@ -26,3 +26,5 @@ v0.2.1保持原文件不变供回退参考。旧JSON项目仅显示升级预览�
 Git：任务Scope用repo或repo/<目录>，RelatedFiles登记精确路径；读取已有本项目repo/.git，不自动初始化/提交。暂无Git如实not-configured；提交/分支/index或相关内容变化需重新预览/核对。完整说明见GIT-AND-CONTENT.md。
 
 公开源码的工作区准备和分支开发见 README.md；GitHub/发行规则见 GITHUB-WORKFLOW.md、RELEASE-POLICY.md。
+
+本轮v0.5新增入口与边界见PUBLICATION-PLAN.md；开发输出runs/v5-build，封存的v0.5.0-rc.1便携候选在releases新目录，旧发行不变。原生自检使用PublicationTests真实本地Git夹具，--publication-check --online仅核对所属repo与已安装gh，不修改认证或远端。

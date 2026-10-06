@@ -1,11 +1,11 @@
 # 验证入口
-在repo运行 .\build.ps1，默认构建releases/v0.4.0。脚本所有环境变量仅作用于子进程环境，不改全局设置。
-领域与持久化：releases/v0.4.0/AIProjectWorkbench.exe --self-test。
+在repo运行 .\build.ps1，默认构建runs/v5-build。脚本所有环境变量仅作用于子进程环境，不改全局设置。
+领域与持久化：runs/v5-build/AIProjectWorkbench.exe --self-test。
 WPF内部视图与渲染：同exe --ui-smoke。
-应用测试入口定义在src/Program.cs的Tests和Program。测试夹具为runs/mvp-test-*；只使用本项目生成数据。UI测试新建runs/v4-ui-<guid>隔离根；不升级现有示例。示例模式渲染使用该夹具内data/examples，与本地空白模式分开。
+应用测试入口定义在src/Program.cs的Tests和Program。测试夹具为runs/mvp-test-*；只使用本项目生成数据。UI测试新建runs/v5-ui-<guid>隔离根；不升级现有示例。示例模式渲染使用该夹具内data/examples，与本地空白模式分开。
 
 证据：
-- runs/mvp-build-final.log：0错误/0警告。
+- runs/v5-build.log：0错误/0警告。
 - runs/mvp-tests.log：逐项夹具PASS/FAIL；不是真实AI或其他项目集成。
 - runs/mvp-ui.log：WPF真实对象/事件处理器检查，内部渲染125/150/200%分辨率，不等于物理OS缩放。
 - runs/mvp-overview.png、mvp-handoff.png、mvp-knowledge.png、mvp-empty.png（若生成）。
@@ -21,3 +21,5 @@ v0.4入口：GitAssetTests.cs。真实Git仓库init/add/fixture commit/branch变
 首轮失败选择了历史PROJECT而非CURRENT现行文档，夹具修正后复测；失败日志与说明保留v4-first-test-failure.log/v4-failure-repair.md。
 
 公开基线见 VALIDATION-BASELINE.md。人工验收矩阵见 MANUAL-WPF-MATRIX.md。私人原始日志/截图不公开；本文件提供复现命令，不代称公开 CI 已运行。
+
+本轮v0.5新增入口与边界见PUBLICATION-PLAN.md；开发输出runs/v5-build，封存的v0.5.0-rc.1便携候选在releases新目录，旧发行不变。原生自检使用PublicationTests真实本地Git夹具，--publication-check --online仅核对所属repo与已安装gh，不修改认证或远端。

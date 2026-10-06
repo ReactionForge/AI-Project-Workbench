@@ -14,5 +14,5 @@ $env:DOTNET_CLI_UI_LANGUAGE = 'en-us'
 $env:DOTNET_CLI_FORCE_UTF8_ENCODING = 'true'
 $env:DOTNET_NOLOGO = 'true'
 $env:DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER = '1'
-dotnet build (Join-Path $PSScriptRoot 'src\Workbench.csproj') --disable-build-servers --configfile (Join-Path $PSScriptRoot 'NuGet.Config') -o (Join-Path $projectRoot 'releases\v0.4.0') 2>&1 | Tee-Object -FilePath (Join-Path $projectRoot 'runs\mvp-build-final.log')
-if ($LASTEXITCODE -ne 0) { throw 'Build failed. See runs/mvp-build-final.log' }
+dotnet build (Join-Path $PSScriptRoot 'src\Workbench.csproj') --disable-build-servers --configfile (Join-Path $PSScriptRoot 'NuGet.Config') -o (Join-Path $projectRoot 'runs\v5-build') 2>&1 | Tee-Object -FilePath (Join-Path $projectRoot 'runs\v5-build.log')
+if ($LASTEXITCODE -ne 0) { throw 'Build failed. See runs/v5-build.log' }

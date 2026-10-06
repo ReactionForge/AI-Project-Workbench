@@ -48,3 +48,8 @@
 !/src/Workbench.csproj
 !/tests/README.md
 !/workspace-marker.json
+!/src/Publication.cs
+!/src/PublicationUI.cs
+!/src/PublicationTests.cs
+!/docs/PUBLICATION-PLAN.md
+!/docs/tasks/T-003.md
